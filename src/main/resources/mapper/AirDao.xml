@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qf.bootair.dao.AirDao">
+
+    <resultMap type="com.qf.bootair.entity.Air" id="AirMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="districtId" column="district_id" jdbcType="INTEGER"/>
+        <result property="monitorTime" column="monitor_time" jdbcType="TIMESTAMP"/>
+        <result property="pm10" column="pm10" jdbcType="INTEGER"/>
+        <result property="pm25" column="pm25" jdbcType="INTEGER"/>
+        <result property="monitoringStation" column="monitoring_station" jdbcType="VARCHAR"/>
+        <result property="lastModifyTime" column="last_modify_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="AirMap">
+        select id,
+               district_id,
+               monitor_time,
+               pm10,
+               pm25,
+               monitoring_station,
+               last_modify_time
+        from air
+        where id = #{id}
+    </select>
+
+    <!--查询所有-->
+    <select id="listAll" resultType="Air">
+        select id,
+               district_id,
+               monitor_time,
+               pm10,
+               pm25,
+               monitoring_station,
+               last_modify_time
+        from air
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from air
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="districtId != null">
+                and district_id = #{districtId}
+            </if>
+            <if test="monitorTime != null">
+                and monitor_time = #{monitorTime}
+            </if>
+            <if test="pm10 != null">
+                and pm10 = #{pm10}
+            </if>
+            <if test="pm25 != null">
+                and pm25 = #{pm25}
+            </if>
+            <if test="monitoringStation != null and monitoringStation != ''">
+                and monitoring_station = #{monitoringStation}
+            </if>
+            <if test="lastModifyTime != null">
+                and last_modify_time = #{lastModifyTime}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into air(district_id, monitor_time, pm10, pm25, monitoring_station, last_modify_time)
+        values (#{districtId}, #{monitorTime}, #{pm10}, #{pm25}, #{monitoringStation}, #{lastModifyTime})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into air(district_id, monitor_time, pm10, pm25, monitoring_station, last_modify_time)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.districtId}, #{entity.monitorTime}, #{entity.pm10}, #{entity.pm25}, #{entity.monitoringStation},
+            #{entity.lastModifyTime})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into air(district_id, monitor_time, pm10, pm25, monitoring_station, last_modify_time)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.districtId}, #{entity.monitorTime}, #{entity.pm10}, #{entity.pm25}, #{entity.monitoringStation},
+            #{entity.lastModifyTime})
+        </foreach>
+        on duplicate key update
+        district_id = values(district_id),
+        monitor_time = values(monitor_time),
+        pm10 = values(pm10),
+        pm25 = values(pm25),
+        monitoring_station = values(monitoring_station),
+        last_modify_time = values(last_modify_time)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update air
+        <set>
+            <if test="districtId != null">
+                district_id = #{districtId},
+            </if>
+            <if test="monitorTime != null">
+                monitor_time = #{monitorTime},
+            </if>
+            <if test="pm10 != null">
+                pm10 = #{pm10},
+            </if>
+            <if test="pm25 != null">
+                pm25 = #{pm25},
+            </if>
+            <if test="monitoringStation != null and monitoringStation != ''">
+                monitoring_station = #{monitoringStation},
+            </if>
+            <if test="lastModifyTime != null">
+                last_modify_time = #{lastModifyTime},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete
+        from air
+        where id = #{id}
+    </delete>
+
+</mapper>
+
